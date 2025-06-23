@@ -1,0 +1,5 @@
+CHI*.sh
+venv/
+vevn/
+.env
+*.pem
