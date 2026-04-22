@@ -1,5 +1,36 @@
-CHI*.sh
+# Credentials & secrets
+*.sh
+*.pem
+*.key
+.env
+*openrc*
+*appcred*
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.eggs/
 venv/
 vevn/
-.env
-*.pem
+.venv/
+
+# Logs
+*.log
+slurm_autoscaler.log
+
+# Keys directory
+keys/
+
+# Test & IDE
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.vscode/
+.idea/
+
+# OS
+.DS_Store

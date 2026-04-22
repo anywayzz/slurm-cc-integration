@@ -1,0 +1,46 @@
+# Slurm Autoscaler Configuration for Chameleon Cloud
+
+cloud:
+  # Path to the OpenRC file (can be absolute or relative to the project root)
+  openrc_path: "openrc.sh"
+  # Path to the SSH private key
+  key_file: "keys/kvmtacc.pvt"
+  # Default region
+  region: "KVM@TACC"
+  # --- Authentication (choose one) ---
+  # Option A: keyring (recommended — encrypted, headless-safe)
+  #   One-time setup: python -m cc_manager.credentials store
+  #   Headless unlock: export KEYRING_CRYPTFILE_PASSWORD='keyring-passphrase'
+  #   (add that export to /etc/slurm/slurm_resume and slurm_suspend wrappers)
+  #
+  # Option B: password_file (simpler fallback — must be chmod 600)
+  #   echo 'yourpassword' > ~/.openstack_password && chmod 600 ~/.openstack_password
+  # password_file: "/home/cc/.openstack_password"
+
+nodes:
+  # Prefix for Slurm node names
+  prefix: "compute-"
+  # Image name or UUID to use for compute nodes
+  image: "CC-Ubuntu24.04"
+  # Flavor name or UUID
+  flavor: "m1.medium"
+  # Network name or UUID
+  network: "sharednet1"
+  # Security group name or UUID
+  security_group: "allow-ssh"
+  # Keypair name registered in OpenStack
+  keypair: "kvmtacckey"
+  # Maximum number of nodes to autoscale
+  max_nodes: 6
+
+# Timeouts in seconds
+timeouts:
+  # Max time to wait for VM to become ACTIVE
+  server_active: 600
+  # Max time to wait for SSH to become ready
+  ssh_ready: 300
+  # Duration of Blazar flavor reservation lease (hours)
+  lease_hours: 2
+  # Blazar lease creation retries and delay between attempts (seconds)
+  lease_retries: 3
+  lease_retry_delay: 60

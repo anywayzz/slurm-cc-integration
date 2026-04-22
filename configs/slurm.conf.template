@@ -1,0 +1,38 @@
+# /etc/slurm/slurm.conf template for Chameleon Cloud Autoscaling
+
+# Control Node Configuration
+# ControlMachine=YOUR_MANAGER_HOSTNAME
+
+# Cluster name
+ClusterName=chameleon-cluster
+
+# Auth
+AuthType=auth/munge
+
+# Logging
+SlurmctldLogFile=/var/log/slurm/slurmctld.log
+SlurmdLogFile=/var/log/slurm/slurmd.log
+
+# COMPUTE NODE DEFINITIONS
+# State=CLOUD is essential for Slurm to treat these nodes as dynamic
+NodeName=compute-[1-6] State=CLOUD
+
+# PARTITIONS
+PartitionName=debug Nodes=compute-[1-6] Default=YES MaxTime=INFINITE State=UP
+
+# AUTOSCALING (POWER MANAGEMENT)
+# These scripts will be called with the hostlist as the first argument
+ResumeProgram=/home/xenzia-gpu-seabios/prj/cc-slurm-autoscaler/slurm_resume.py
+SuspendProgram=/home/xenzia-gpu-seabios/prj/cc-slurm-autoscaler/slurm_suspend.py
+
+# Nodes will be suspended after being idle for this many seconds
+SuspendTime=300
+
+# Time allowed for nodes to boot and report in
+ResumeTimeout=600
+
+# Time allowed for nodes to shutdown
+SuspendTimeout=300
+
+# Critical for autoscaling to work correctly with dynamic IPs
+CommunicationParameters=NoAddrCache

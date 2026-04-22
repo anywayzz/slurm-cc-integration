@@ -1,0 +1,9 @@
+profiles:
+- name: test-proj
+  openrc: openrc.sh
+  key_file: keys/kvmtacckey.pvt
+active_profile: test-proj
+work_volume:
+  name: voltestcli
+  size_gb: 10
+  mount_point: /mnt/data
