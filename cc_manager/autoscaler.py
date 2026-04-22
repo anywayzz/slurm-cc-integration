@@ -6,6 +6,7 @@ import datetime
 import logging
 import os
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 import yaml
 from typing import List, Optional
@@ -121,10 +122,11 @@ class SlurmAutoscaler:
         reserved_flavor = reserved_flavors[0].name
         log.info("Reserved flavor: %s", reserved_flavor)
 
-        # ── Create VMs ────────────────────────────────────────────────────────
+        # ── Create VMs in parallel ────────────────────────────────────────────
         timeout = self.config.get("timeouts", {}).get("server_active", 600)
         ssh_timeout = self.config.get("timeouts", {}).get("ssh_ready", 300)
-        for node_name in nodes_to_create:
+
+        def _resume_one(node_name: str) -> None:
             try:
                 log.info("Creating VM for node %s", node_name)
                 server_id = self.manager.create_vm(
@@ -149,6 +151,11 @@ class SlurmAutoscaler:
                     log.warning("Node %s has no IP yet — slurmd setup skipped.", node_name)
             except Exception as e:
                 log.error("Failed to resume node %s: %s", node_name, e)
+
+        with ThreadPoolExecutor(max_workers=len(nodes_to_create)) as executor:
+            futures = {executor.submit(_resume_one, n): n for n in nodes_to_create}
+            for fut in as_completed(futures):
+                fut.result()  # re-raises if _resume_one raised (already logged)
 
     def _get_node_ip(self, server_id: str) -> str | None:
         """Return the fixed (internal) IP of a server from its network addresses."""
